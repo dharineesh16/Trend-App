@@ -1,8 +1,9 @@
 pipeline {
     agent any
+
     environment {
         DOCKER_IMAGE = "dharineesh01/trend-app:latest"
-        REPO_URL = "https://github.com/dharineesh16/trend-app.git"
+        REPO_URL = "https://github.com/dharineesh16/Trend-App.git"
     }
 
     stages {
@@ -43,7 +44,13 @@ pipeline {
             }
         }
     }
+
+    post {
+        success {
+            echo "Deployment succeeded ✅"
+        }
+        failure {
+            echo "Deployment failed ❌"
+        }
+    }
 }
-
-
-
