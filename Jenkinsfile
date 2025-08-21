@@ -14,11 +14,25 @@ pipeline {
             }
         }
 
+        stage('Configure kubeconfig') {
+            steps {
+                withCredentials([file(credentialsId: 'eks-kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+                    sh '''
+                        mkdir -p $HOME/.kube
+                        cp $KUBECONFIG_FILE $HOME/.kube/config
+                        chmod 600 $HOME/.kube/config
+                        echo "Kubeconfig configured for Jenkins agent"
+                    '''
+                }
+            }
+        }
+
         stage('Deploy to EKS') {
             steps {
                 sh '''
                     which kubectl
                     kubectl version --client
+                    kubectl config get-contexts
                     kubectl set image deployment/trend-app trend-app=${DOCKER_IMAGE} --record
                     kubectl rollout status deployment/trend-app
                 '''
@@ -26,3 +40,4 @@ pipeline {
         }
     }
 }
+
