@@ -16,12 +16,10 @@ pipeline {
 
         stage('Configure kubeconfig') {
             steps {
-                withCredentials([file(credentialsId: 'eks-kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
                     sh '''
-                        mkdir -p $HOME/.kube
-                        cp $KUBECONFIG_FILE $HOME/.kube/config
-                        export KUBECONFIG=$HOME/.kube/config
-                        kubectl config use-context arn:aws:eks:ap-south-1:683342011355:cluster/trend-cluster
+                        aws eks --region ap-south-1 update-kubeconfig --name trend-cluster
+                        kubectl config current-context
                     '''
                 }
             }
@@ -40,3 +38,4 @@ pipeline {
         }
     }
 }
+
