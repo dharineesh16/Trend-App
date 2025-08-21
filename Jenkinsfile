@@ -3,22 +3,33 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "dharineesh01/trend-app:latest"
-        REPO_URL = "https://github.com/dharineesh16/Trend-App.git"
+        AWS_REGION   = "ap-south-1"
+        EKS_CLUSTER  = "trend-cluster"
     }
 
     stages {
-        stage('Clone Repo') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', url: "${REPO_URL}"
+                git branch: 'main', url: 'https://github.com/dharineesh16/Trend-App.git'
             }
         }
 
         stage('Build & Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        def app = docker.build("${DOCKER_IMAGE}")
-                        app.push()
+                    withCredentials([usernamePassword(
+                        credentialsId: 'dockerhub-credentials', 
+                        usernameVariable: 'DOCKER_USER', 
+                        passwordVariable: 'DOCKER_TOKEN')]) {
+                        
+                        // Docker login using Personal Access Token
+                        sh 'echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin'
+                        
+                        // Build Docker image
+                        sh "docker build -t $DOCKER_IMAGE ."
+                        
+                        // Push Docker image to Docker Hub
+                        sh "docker push $DOCKER_IMAGE"
                     }
                 }
             }
@@ -26,31 +37,32 @@ pipeline {
 
         stage('Configure kubeconfig') {
             steps {
-                withAWS(credentials: 'aws-credentials', region: 'ap-south-1') {
-                    sh '''
-                        aws eks update-kubeconfig --region ap-south-1 --name trend-cluster
-                        kubectl get nodes
-                    '''
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding',
+                     credentialsId: 'aws-credentials']] ) {
+                    sh "aws eks --region ap-south-1 update-kubeconfig --name trend-cluster"
                 }
             }
         }
 
         stage('Deploy to EKS') {
             steps {
-                sh '''
-                    kubectl set image deployment/trend-deployment trend-container=${DOCKER_IMAGE} --record
+                sh """
+                    kubectl apply -f deployment.yaml
+                    kubectl apply -f service.yaml
                     kubectl rollout status deployment/trend-deployment
-                '''
+                """
             }
         }
     }
 
     post {
         success {
-            echo "Deployment succeeded ✅"
+            echo 'Deployment succeeded ✅'
         }
         failure {
-            echo "Deployment failed ❌"
+            echo 'Deployment failed ❌'
         }
     }
 }
+
