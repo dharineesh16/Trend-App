@@ -20,8 +20,8 @@ pipeline {
                     sh '''
                         mkdir -p $HOME/.kube
                         cp $KUBECONFIG_FILE $HOME/.kube/config
-                        chmod 600 $HOME/.kube/config
-                        echo "Kubeconfig configured for Jenkins agent"
+                        export KUBECONFIG=$HOME/.kube/config
+                        kubectl config use-context arn:aws:eks:ap-south-1:683342011355:cluster/trend-cluster
                     '''
                 }
             }
@@ -32,12 +32,11 @@ pipeline {
                 sh '''
                     which kubectl
                     kubectl version --client
-                    kubectl config get-contexts
-                    kubectl set image deployment/trend-app trend-app=${DOCKER_IMAGE} --record
-                    kubectl rollout status deployment/trend-app
+                    kubectl get nodes
+                    kubectl set image deployment/trend-app trend-app=${DOCKER_IMAGE} --record -n default
+                    kubectl rollout status deployment/trend-app -n default
                 '''
             }
         }
     }
 }
-
