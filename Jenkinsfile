@@ -2,67 +2,64 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "dharineesh01/trend-app:latest"
-        AWS_REGION   = "ap-south-1"
-        EKS_CLUSTER  = "trend-cluster"
+        APP_NAME = "trend-app"
+        IMAGE_NAME = "dharineesh01/trend-app:latest"
+        EKS_CLUSTER = "trend-cluster"
+        AWS_REGION = "ap-south-1"  // Change as per your EKS region
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/dharineesh16/Trend-App.git'
+                git(
+                    url: 'https://github.com/dharineesh16/Trend-App.git',
+                    branch: 'main',
+                    credentialsId: 'github-credentials' // Your GitHub credential ID
+                )
             }
         }
 
         stage('Build & Push Docker Image') {
             steps {
-                script {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub-credentials:'dckr_pat_TjH_OlQLo82LnqnkViDxi-SX73o'', 
-                        usernameVariable: 'DOCKER_USER', 
-                        passwordVariable: 'DOCKER_TOKEN')]) {
-                        
-                        // Docker login using Personal Access Token
-                        sh 'echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin'
-                        
-                        // Build Docker image
-                        sh "docker build -t $DOCKER_IMAGE ."
-                        
-                        // Push Docker image to Docker Hub
-                        sh "docker push $DOCKER_IMAGE"
-                    }
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials', // Your Docker Hub credential ID
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    sh '''
+                        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+                        docker build -t $IMAGE_NAME .
+                        docker push $IMAGE_NAME
+                    '''
                 }
             }
         }
 
         stage('Configure kubeconfig') {
             steps {
-                withCredentials([
-                    [$class: 'AmazonWebServicesCredentialsBinding',
-                     credentialsId: 'aws-credentials']] ) {
-                    sh "aws eks --region ap-south-1 update-kubeconfig --name trend-cluster"
+                withAWS(region: "${AWS_REGION}", credentials: 'aws-jenkins-credentials') { // AWS credentials ID
+                    sh "aws eks update-kubeconfig --name ${EKS_CLUSTER} --region ${AWS_REGION}"
                 }
             }
         }
 
         stage('Deploy to EKS') {
             steps {
-                sh """
+                sh '''
                     kubectl apply -f deployment.yaml
                     kubectl apply -f service.yaml
-                    kubectl rollout status deployment/trend-deployment
-                """
+                    kubectl rollout status deployment/trend-app
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'Deployment succeeded ✅'
+            echo "✅ Deployment Successful!"
         }
         failure {
-            echo 'Deployment failed ❌'
+            echo "❌ Deployment Failed!"
         }
     }
 }
-
