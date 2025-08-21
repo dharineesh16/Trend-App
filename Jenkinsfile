@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     environment {
         DOCKER_IMAGE = "dharineesh01/trend-app:latest"
         REPO_URL = "https://github.com/dharineesh16/trend-app.git"
@@ -28,8 +27,8 @@ pipeline {
             steps {
                 withAWS(credentials: 'aws-credentials', region: 'ap-south-1') {
                     sh '''
-                        aws --version
                         aws eks update-kubeconfig --region ap-south-1 --name trend-cluster
+                        kubectl get nodes
                     '''
                 }
             }
@@ -45,5 +44,6 @@ pipeline {
         }
     }
 }
+
 
 
