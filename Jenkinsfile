@@ -4,7 +4,6 @@ pipeline {
     environment {
         DOCKER_IMAGE = "dharineesh01/trend-app:latest"
         REPO_URL = "https://github.com/dharineesh16/trend-app.git"
-        PATH = "/usr/local/bin:/usr/bin:/bin"
     }
 
     stages {
@@ -14,12 +13,23 @@ pipeline {
             }
         }
 
+        stage('Build & Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        def app = docker.build("${DOCKER_IMAGE}")
+                        app.push()
+                    }
+                }
+            }
+        }
+
         stage('Configure kubeconfig') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                withAWS(credentials: 'aws-credentials', region: 'ap-south-1') {
                     sh '''
-                        aws eks --region ap-south-1 update-kubeconfig --name trend-cluster
-                        kubectl config current-context
+                        aws --version
+                        aws eks update-kubeconfig --region ap-south-1 --name trend-cluster
                     '''
                 }
             }
@@ -28,14 +38,12 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 sh '''
-                    which kubectl
-                    kubectl version --client
-                    kubectl get nodes
-                    kubectl set image deployment/trend-app trend-app=${DOCKER_IMAGE} --record -n default
-                    kubectl rollout status deployment/trend-app -n default
+                    kubectl set image deployment/trend-deployment trend-container=${DOCKER_IMAGE} --record
+                    kubectl rollout status deployment/trend-deployment
                 '''
             }
         }
     }
 }
+
 
