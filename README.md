@@ -80,7 +80,7 @@ jenkins url:http://13.127.41.61:8080/
 
 4. Add Prometheus Data Source:  
    - URL: `http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090`  
-## 📸 Screenshots (Attach Here)  
+## 📸 Screenshots (Attached Here)  
 - ✅ Docker build success  
 - ✅ ECR image pushed  
 - ✅ EKS pods running  
