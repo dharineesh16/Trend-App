@@ -70,7 +70,7 @@ jenkins url:http://13.127.41.61:8080/
 2. Get Grafana Admin Password:  
    ```bash
    kubectl get secret prometheus-grafana -n monitoring -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-   ```
+
 
 3. Access Grafana via LoadBalancer:  
    bash
@@ -95,6 +95,6 @@ jenkins url:http://13.127.41.61:8080/
 📍 Application is exposed via:  
 
 **LoadBalancer ARN / DNS:**  
-a9ae82d2e9d0043cdb3794c97bc180b3-263413076.ap-south-1.elb.amazonaws.com
+a2e4c6747ac634d36836fd2009aceb49-1560738099.ap-south-1.elb.amazonaws.com
 ## ✅ Conclusion  
 This project demonstrates an **end-to-end CI/CD pipeline** with monitoring, making the app production-ready on AWS EKS.  
