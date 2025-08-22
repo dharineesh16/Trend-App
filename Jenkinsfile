@@ -45,12 +45,15 @@ pipeline {
 
         stage('Deploy to EKS') {
             steps {
+                withAWS(region: "${AWS_REGION}", credentials: 'aws-jenkins-credentials') {
+                
                 sh '''
                     kubectl apply -f deployment.yaml
                     kubectl apply -f service.yaml
                     kubectl apply -f trend-service.yaml
                     kubectl rollout status deployment/trend-app
                 '''
+                }
             }
         }
     }
