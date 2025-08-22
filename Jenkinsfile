@@ -38,7 +38,7 @@ pipeline {
         stage('Configure kubeconfig') {
             steps {
                 withAWS(region: "${AWS_REGION}", credentials: 'aws-jenkins-credentials') { // AWS credentials ID
-                    sh "aws eks update-kubeconfig --name ${EKS_CLUSTER} --region ${AWS_REGION}"
+                    sh "aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER}"
                 }
             }
         }
@@ -48,6 +48,7 @@ pipeline {
                 sh '''
                     kubectl apply -f deployment.yaml
                     kubectl apply -f service.yaml
+                    kubectl apply -f trend-service.yaml
                     kubectl rollout status deployment/trend-app
                 '''
             }
