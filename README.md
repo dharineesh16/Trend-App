@@ -81,20 +81,26 @@ jenkins url:http://13.127.41.61:8080/
 4. Add Prometheus Data Source:  
    - URL: `http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090`  
 ## 📸 Screenshots (Attached Here)  
-- ✅ Docker build success  
-- ✅ ECR image pushed  
-- ✅ EKS pods running  
+- ✅ terraform output
+ https://github.com/dharineesh16/Trend-App/blob/main/screenshots/1.png
 - ✅ LoadBalancer DNS working  
-- ✅ Jenkins pipeline run  
-- ✅ Grafana dashboard  
+-  https://github.com/dharineesh16/Trend-App/blob/main/screenshots/13.png
+- ✅ Jenkins pipeline run
+  https://github.com/dharineesh16/Trend-App/blob/main/screenshots/6.png
+- ✅ prometheus
+  https://github.com/dharineesh16/Trend-App/blob/main/screenshots/10.png
+- ✅ Grafana Dashboard
+   https://github.com/dharineesh16/Trend-App/blob/main/screenshots/8.png
+
 
 ---
 
 ## 🔗 LoadBalancer ARN  
 
-📍 Application is exposed via:  
+📍 Application is exposed via:
 
 **LoadBalancer ARN / DNS:**  
 a2e4c6747ac634d36836fd2009aceb49-1560738099.ap-south-1.elb.amazonaws.com
 ## ✅ Conclusion  
 This project demonstrates an **end-to-end CI/CD pipeline** with monitoring, making the app production-ready on AWS EKS.  
+ 
