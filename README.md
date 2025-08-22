@@ -82,15 +82,29 @@ jenkins url:http://13.127.41.61:8080/
    - URL: `http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090`  
 ## 📸 Screenshots (Attached Here)  
 - ✅ terraform output
- https://github.com/dharineesh16/Trend-App/blob/main/screenshots/1.png
+ ![image alt](https://github.com/dharineesh16/Trend-App/blob/main/screenshots/1.png)
+
+
+
 - ✅ LoadBalancer DNS working  
--  https://github.com/dharineesh16/Trend-App/blob/main/screenshots/13.png
+-  ![image alt](https://github.com/dharineesh16/Trend-App/blob/main/screenshots/13.png)
+
+
 - ✅ Jenkins pipeline run
-  https://github.com/dharineesh16/Trend-App/blob/main/screenshots/6.png
+  ![image alt](https://github.com/dharineesh16/Trend-App/blob/main/screenshots/6.png)
+
+
+  
 - ✅ prometheus
-  https://github.com/dharineesh16/Trend-App/blob/main/screenshots/10.png
+  ![image alt](https://github.com/dharineesh16/Trend-App/blob/main/screenshots/10.png)
+
+
+  
 - ✅ Grafana Dashboard
-   https://github.com/dharineesh16/Trend-App/blob/main/screenshots/8.png
+   ![image alt](https://github.com/dharineesh16/Trend-App/blob/main/screenshots/8.png)
+
+
+
 
 
 ---
